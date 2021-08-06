@@ -22,8 +22,8 @@ def get_random_noise(dim, batch_size=1): return torch.randn((batch_size, dim))
 def get_basic_transform():
     return transforms.Compose([
         transforms.ToTensor(),
-        transforms.Resize((size, size))
-        transforms.Normalize(((0.5,), (0.5,), )),
+        transforms.Resize((size, size)),
+        transforms.Normalize(((0.5,), (0.5,), ))
     ])
 
 class ImageDir(Dataset):
