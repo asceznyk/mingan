@@ -43,7 +43,7 @@ class ImageDir(Dataset):
 
 class Discriminator(nn.Module):
     def __init__(self, img_dim):
-        super().__init()
+        super().__init__()
         self.img_dim = img_dim
         self.disc = nn.Sequential(
             nn.Linear(img_dim, 128),
@@ -57,7 +57,7 @@ class Discriminator(nn.Module):
 
 class Generator(nn.Module):
     def __init__(self, z_dim, img_dim):
-        super().__init()
+        super().__init__()
         self.z_dim = z_dim
         self.gen = nn.Sequential(
             nn.Linear(z_dim, 256),
