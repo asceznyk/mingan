@@ -70,6 +70,8 @@ class Generator(nn.Module):
         return self.gen(x)
 
 def train_basic_gan(options):
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
     if options.dataset is None:
         img_size = 28
         basic_tsfm = get_basic_transform(img_size)
@@ -79,14 +81,13 @@ def train_basic_gan(options):
     z_dim = options.z_dim
     disc = Discriminator(img_dim)
     gen = Generator(z_dim, img_dim)
+    disc, gen = disc.to(device), gen.to(device)
 
     loader = DataLoader(dataset, batch_size=options.batch_size, shuffle=True)
 
-    sample_batch = next(iter(loader))
-
-    px = disc(sample_batch)
-
-    print(px)
+    for b, (imgs, _) in enumerate(loader):
+        px = disc(imgs.to(device))
+        print(px)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
