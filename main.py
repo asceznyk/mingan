@@ -32,7 +32,7 @@ class Generator(nn.Module):
         self.gen = nn.Sequential(
             nn.Linear(z_dim, 256),
             nn.LeakyRELU(0.01),
-            nn.Linear(256 img_dim),
+            nn.Linear(256, img_dim),
             nn.Tanh()
         )
 
