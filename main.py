@@ -39,11 +39,8 @@ class ImageDir(Dataset):
         self.z_dim = z_dim
 
     def __getitem__(self, i):
-        noise = get_random_noise(self.z_dim)[0]
         img = Image.open(self.files[0])
-        img = self.transform(img)
-
-        return img, noise
+        return self.transform(img)
 
 class Discriminator(nn.Module):
     def __init__(self, img_dim):
@@ -88,17 +85,20 @@ def plt_imgs(imgs, batch_size, save_path):
 def train_basic_gan(options):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-    if options.dataset is None:
-        img_size = 28
-        basic_tsfm = get_basic_transform(img_size)
-        dataset = datasets.FashionMNIST(root='dataset/', transform=basic_tsfm, download=True)
-        img_dim = 1*img_size*img_size
-
     lr = 3e-4
-    batch_size = options.batch_size
+    img_size = options.img_size
     z_dim = options.z_dim
+    batch_size = options.batch_size
     epochs = options.epochs
-    k_steps = 1
+    k_steps = options.k_steps
+    img_dim = 1*img_size*img_size
+
+    basic_tsfm = get_basic_transform(options.img_size)
+
+    if options.dataset is None:
+        dataset = datasets.FashionMNIST(root='dataset/', transform=basic_tsfm, download=True)
+    else:
+        dataset = ImageDir(options.dataset, basic_tsfm, z_dim)
 
     disc = Discriminator(img_dim)
     gen = Generator(z_dim, img_dim)
@@ -112,11 +112,11 @@ def train_basic_gan(options):
     noise = lambda : get_random_noise(z_dim, batch_size).to(device)
 
     for e in range(epochs):
-        for b, (real_imgs, _) in tqdm(enumerate(loader), total=len(loader)):
-            real_imgs = real_imgs.view(-1, img_dim).to(device)
-            fake_imgs = gen(noise()).to(device)
+        for k in range(k_steps):
+            for b, (real_imgs, _) in tqdm(enumerate(loader), total=len(loader)):
+                real_imgs = real_imgs.view(-1, img_dim).to(device)
+                fake_imgs = gen(noise()).to(device)
 
-            for k in range(k_steps):
                 px = disc(real_imgs)
                 pg = disc(fake_imgs)
 
@@ -128,6 +128,7 @@ def train_basic_gan(options):
                 loss_d.backward(retain_graph=True)
                 optim_disc.step()
 
+        for b in range(len(loader)):
             fake_imgs = gen(noise()).to(device)
             pg = disc(fake_imgs)
 
@@ -153,8 +154,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--dataset', type=str, help='path to image folder you want to train on', default=None)
+    parser.add_argument('--img_size', type=int,  help='image size', default=28)
     parser.add_argument('--batch_size', type=int, help='batch size', default=32)
     parser.add_argument('--z_dim', type=int, help='dimensionality of noise', default=64)
+    parser.add_argument('--k_steps', type=int, help='number of steps to train discriminator', default=1)
     parser.add_argument('--epochs', type=int, help='number of epochs to train model', default=50)
 
     options = parser.parse_args()
