@@ -99,7 +99,7 @@ def train_basic_gan(options):
     basic_tsfm = get_basic_transform(options.img_size)
 
     if options.dataset is None:
-        dataset = datasets.FashionMNIST(root='dataset/', transform=basic_tsfm, download=True)
+        dataset = datasets.MNIST(root='dataset/', transform=basic_tsfm, download=True)
     else:
         dataset = ImageDir(options.dataset, basic_tsfm, z_dim)
 
