@@ -55,3 +55,14 @@ def train_basic_gan(options):
     px = disc(sample_batch)
 
     print(px)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--dataset', type=str, help='path to image folder you want to train on', default=None)
+
+    options = parser.parse_args()
+
+    print(options)
+
+    train_basic_gan(options)
