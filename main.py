@@ -113,7 +113,7 @@ def train_basic_gan(options):
     for e in range(epochs):
         for b, (real_imgs, _) in tqdm(enumerate(loader), total=len(loader)):
             real_imgs = real_imgs.view(-1, img_dim).to(device)
-            fake_imgs = gen(get_random_noise(z_dim, batch_size)).to(device)
+            fake_imgs = gen(get_random_noise(z_dim, batch_size).to(device)).to(device)
 
             for k in range(k_steps):
                 px = disc(real_imgs)
@@ -127,7 +127,7 @@ def train_basic_gan(options):
                 loss_d.backward(retain_graph=True)
                 optim_disc.step()
 
-            fake_imgs = gen(get_random_noise(z_dim, batch_size)).to(device)
+            fake_imgs = gen(get_random_noise(z_dim, batch_size).to(device)).to(device)
             pg = disc(fake_imgs)
 
             loss_g = criterion(pg, torch.ones_like(pg)) #log(d(g(z))) maximizing
