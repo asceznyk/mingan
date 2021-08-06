@@ -80,7 +80,7 @@ def plt_imgs(imgs, batch_size):
     for r in range(rows):
         for c in range(cols):
             img = imgs[(r * cols + c % cols)]
-            axs[r, c].imshow(img, cmap='gray')
+            axs[r, c].imshow(img*255, cmap='gray')
 
     plt.show()
     plt.savefig('sampleimgs.png')
