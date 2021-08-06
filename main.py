@@ -23,7 +23,7 @@ def get_basic_transform(size):
     return transforms.Compose([
         transforms.ToTensor(),
         transforms.Resize((size, size)),
-        transforms.Normalize(((0.5,), (0.5,), ))
+        transforms.Normalize((0.5,), (0.5,))
     ])
 
 class ImageDir(Dataset):
