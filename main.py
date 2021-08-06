@@ -95,7 +95,7 @@ def train_basic_gan(options):
     lr = 3e-4
     batch_size = options.batch_size
     z_dim = options.z_dim
-    epochs = optios.epochs
+    epochs = options.epochs
     k_steps = 1
 
     disc = Discriminator(img_dim)
