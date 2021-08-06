@@ -109,7 +109,7 @@ def train_basic_gan(options):
     for b, (real_imgs, _) in enumerate(loader):
         real_imgs = real_imgs.view(-1, img_dim).to(device)
         noises = get_random_noise(z_dim, batch_size)
-        px = disc(imgs)
+        px = disc(real_imgs)
 
         if b <= 0:
             fake_imgs = gen(noises)
