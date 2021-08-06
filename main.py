@@ -9,6 +9,8 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
+from tqdm import tqdm
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -109,7 +111,7 @@ def train_basic_gan(options):
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
     for e in range(epochs):
-        for b, (real_imgs, _) in enumerate(loader):
+        for b, (real_imgs, _) in tqdm(enumerate(loader), total=len(loader)):
             real_imgs = real_imgs.view(-1, img_dim).to(device)
             fake_imgs = gen(get_random_noise(z_dim, batch_size))
 
@@ -125,8 +127,6 @@ def train_basic_gan(options):
                 loss_d.backward(retain_graph=True)
                 optim_disc.step()
 
-            print(f'discriminator loss at epoch {e} batch {b} = {loss_d.item()}')
-
             fake_imgs = gen(get_random_noise(z_dim, batch_size))
             pg = disc(fake_imgs)
 
@@ -134,8 +134,6 @@ def train_basic_gan(options):
             gen.zero_grad()
             loss_g.backward()
             optim_gen.step()
-
-            print(f'generator loss at epoch {e} batch {b} = {loss_g.item()}')
 
             if e >= epochs-1 and b <= 0:
                 real_imgs = real_imgs.view(-1, img_size, img_size)
@@ -145,6 +143,9 @@ def train_basic_gan(options):
                 fake_imgs = fake_imgs.view(-1, img_size, img_size)
                 fake_imgs = fake_imgs.detach().cpu().numpy()
                 plt_imgs(fake_imgs, batch_size, 'fakeimgs.png')
+
+        print(f'discriminator loss at epoch {e} = {loss_d.item()}')
+        print(f'generator loss at epoch {e} = {loss_g.item()}')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
