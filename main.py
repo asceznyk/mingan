@@ -95,6 +95,8 @@ def train_basic_gan(options):
     lr = 3e-4
     batch_size = options.batch_size
     z_dim = options.z_dim
+    epochs = optios.epochs
+    k_steps = 1
 
     disc = Discriminator(img_dim)
     gen = Generator(z_dim, img_dim)
@@ -106,19 +108,39 @@ def train_basic_gan(options):
 
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-    for b, (real_imgs, _) in enumerate(loader):
-        real_imgs = real_imgs.view(-1, img_dim).to(device)
-        noises = get_random_noise(z_dim, batch_size)
-        px = disc(real_imgs)
+    for e in epochs:
+        for b, (real_imgs, _) in enumerate(loader):
+            real_imgs = real_imgs.view(-1, img_dim).to(device)
+            fake_imgs = gen(get_random_noise(z_dim, batch_size))
 
-        if b <= 0:
-            fake_imgs = gen(noises)
-            fake_imgs = fake_imgs.view(-1, img_size, img_size)
-            plt_imgs(fake_imgs.detach().cpu().numpy(), batch_size, 'fakeimgs.png')
-            real_imgs = real_imgs.view(-1, img_size, img_size)
-            plt_imgs(real_imgs.detach().cpu().numpy(), batch_size, 'realimgs.png')
+            for k in range(k_steps):
+                px = disc(real_imgs)
+                pg = disc(fake_imgs)
 
-        pg = disc(gen(noises))
+                loss_dx = criterion(px, torch.ones_like(px)) #log(d(x))
+                loss_dg = criterion(pg, torch.zeros_like(pg)) #log((1 - d(g(z))))
+                loss_d = (loss_dx + loss_dg) / 2
+
+                disc.zero_grad()
+                loss_d.backward(retain_graph=True)
+                optim_disc.step()
+
+            fake_imgs = gen(get_random_noise(z_dim, batch_size))
+            pg = disc(fake_imgs)
+
+            loss_g = criterion(pg, torch.ones_like(pg)) #log(d(g(z))) maximizing
+            gen.zero_grad()
+            loss_g.backward()
+            optim_gen.step()
+
+            if e >= epochs-1 and b <= 0:
+                real_imgs = real_imgs.view(-1, img_size, img_size)
+                real_imgs = real_imgs.detach().cpu().numpy()
+                plt_imgs(real_imgs, batch_size, 'realimgs.png')
+
+                fake_imgs = fake_imgs.view(-1, img_size, img_size)
+                fake_imgs = fake_imgs.detach().cpu().numpy()
+                plt_imgs(fake_imgs, batch_size, 'fakeimgs.png')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -126,6 +148,7 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', type=str, help='path to image folder you want to train on', default=None)
     parser.add_argument('--batch_size', type=int, help='batch size', default=32)
     parser.add_argument('--z_dim', type=int, help='dimensionality of noise', default=64)
+    parser.add_argument('--epochs', type=int, help='number of epochs to train model', default=50)
 
     options = parser.parse_args()
 
