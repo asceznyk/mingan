@@ -88,7 +88,7 @@ def plt_imgs(imgs, batch_size, save_path):
 def train_basic_gan(options):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-    lr = 3e-4
+    lr = options.lr
     img_size = options.img_size
     z_dim = options.z_dim
     batch_size = options.batch_size
@@ -161,6 +161,7 @@ if __name__ == '__main__':
     parser.add_argument('--z_dim', type=int, help='dimensionality of noise', default=64)
     parser.add_argument('--k_steps', type=int, help='number of steps to train discriminator', default=1)
     parser.add_argument('--epochs', type=int, help='number of epochs to train model', default=50)
+    parser.add_argument('--lr', type=float, help='learning rate', default=3e-4)
 
     options = parser.parse_args()
 
