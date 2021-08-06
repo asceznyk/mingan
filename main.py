@@ -43,7 +43,7 @@ class ImageDir(Dataset):
 
     def __getitem__(self, i):
         img = Image.open(self.files[0])
-        return self.transform(img)
+        return self.transform(img), 1
 
 class Discriminator(nn.Module):
     def __init__(self, img_dim):
