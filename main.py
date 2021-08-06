@@ -112,8 +112,8 @@ def train_basic_gan(options):
     noise = lambda : get_random_noise(z_dim, batch_size).to(device)
 
     for e in range(epochs):
-        for k in range(k_steps):
-            for b, (real_imgs, _) in tqdm(enumerate(loader), total=len(loader)):
+        for b, (real_imgs, _) in tqdm(enumerate(loader), total=len(loader)):
+            for k in range(k_steps):
                 real_imgs = real_imgs.view(-1, img_dim).to(device)
                 fake_imgs = gen(noise()).to(device)
 
@@ -128,7 +128,6 @@ def train_basic_gan(options):
                 loss_d.backward(retain_graph=True)
                 optim_disc.step()
 
-        for b in range(len(loader)):
             fake_imgs = gen(noise()).to(device)
             pg = disc(fake_imgs)
 
