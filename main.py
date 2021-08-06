@@ -38,6 +38,9 @@ class ImageDir(Dataset):
 
         self.z_dim = z_dim
 
+    def __len__(self):
+        return len(self.files)
+
     def __getitem__(self, i):
         img = Image.open(self.files[0])
         return self.transform(img)
