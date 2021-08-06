@@ -17,7 +17,7 @@ class Discriminator(nn.Module):
         self.img_dim = img_dim
         self.disc = nn.Sequential(
             nn.Linear(img_dim, 128),
-            nn.LeakyRELU(0.01)
+            nn.LeakyRELU(0.01),
             nn.Linear(128, 1),
             nn.Sigmoid()
         )
@@ -31,7 +31,7 @@ class Generator(nn.Module):
         self.z_dim = z_dim
         self.gen = nn.Sequential(
             nn.Linear(z_dim, 256),
-            nn.LeakyRELU(0.01)
+            nn.LeakyRELU(0.01),
             nn.Linear(256 img_dim),
             nn.Tanh()
         )
