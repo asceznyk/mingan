@@ -78,17 +78,20 @@ def train_basic_gan(options):
         dataset = datasets.FashionMNIST(root='dataset/', transform=basic_tsfm, download=True)
         img_dim = 1*img_size*img_size
 
+    batch_size = options.batch_size
     z_dim = options.z_dim
     disc = Discriminator(img_dim)
     gen = Generator(z_dim, img_dim)
     disc, gen = disc.to(device), gen.to(device)
 
-    loader = DataLoader(dataset, batch_size=options.batch_size, shuffle=True)
+    loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
     for b, (imgs, _) in enumerate(loader):
         imgs = imgs.view(-1, img_dim).to(device)
+        noises = get_random_noise(z_dim, batch_size)
         px = disc(imgs)
-        print(px)
+        pg = disc(gen(noises))
+        print(pg)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
