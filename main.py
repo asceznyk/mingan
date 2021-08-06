@@ -19,7 +19,7 @@ from torch.utils.data import Dataset, DataLoader
 
 def get_random_noise(dim, batch_size=1): return torch.randn((batch_size, dim))
 
-def get_basic_transform():
+def get_basic_transform(size):
     return transforms.Compose([
         transforms.ToTensor(),
         transforms.Resize((size, size)),
@@ -70,15 +70,17 @@ class Generator(nn.Module):
         return self.gen(x)
 
 def train_basic_gan(options):
-    basic_tsfm = get_basic_transform()
     if options.dataset is None:
+        img_size = 28
+        basic_tsfm = get_basic_transform(img_size)
         dataset = datasets.FashionMNIST(root='dataset/', transform=basic_tsfm, dowload=True)
-        img_dim,  z_dim = 1*28*28, 64
+        img_dim = 1*img_size*img_size
 
+    z_dim = options.z_dim
     disc = Discriminator(img_dim)
     gen = Generator(z_dim, img_dim)
 
-    loader = DataLoader(dataset, batch_size=32, shuffle=True)
+    loader = DataLoader(dataset, batch_size=options.batch_size, shuffle=True)
 
     sample_batch = next(iter(loader))
 
@@ -90,6 +92,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--dataset', type=str, help='path to image folder you want to train on', default=None)
+    parser.add_argument('--batch_size', type=int, help='batch size', default=32)
+    parser.add_argument('--z_dim', type=int, help='dimensionality of noise', default=64)
 
     options = parser.parse_args()
 
