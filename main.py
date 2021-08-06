@@ -109,7 +109,7 @@ def train_basic_gan(options):
     optim_gen = optim.Adam(gen.parameters(), lr=lr)
 
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
-    noise = lambda _  : get_random_noise(z_dim, batch_size).to(device)
+    noise = lambda : get_random_noise(z_dim, batch_size).to(device)
 
     for e in range(epochs):
         for b, (real_imgs, _) in tqdm(enumerate(loader), total=len(loader)):
