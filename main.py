@@ -78,9 +78,8 @@ def plt_imgs(imgs, batch_size):
     for r in range(rows):
         for c in range(cols):
             img = imgs[(r * cols + c % cols)]
+            print(img)
             axs[r, c].imshow(img, cmap='gray')
-
-    fig.show()
 
 
 def train_basic_gan(options):
