@@ -83,6 +83,7 @@ def plt_imgs(imgs, batch_size):
             axs[r, c].imshow(img, cmap='gray')
 
     plt.show()
+    plt.savefig('sampleimgs.png')
 
 
 def train_basic_gan(options):
