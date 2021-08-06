@@ -162,3 +162,4 @@ if __name__ == '__main__':
     print(options)
 
     train_basic_gan(options)
+
