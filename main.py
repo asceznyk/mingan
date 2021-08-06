@@ -42,7 +42,7 @@ class ImageDir(Dataset):
         return len(self.files)
 
     def __getitem__(self, i):
-        img = Image.open(self.files[0])
+        img = Image.open(self.files[i])
         return self.transform(img), 1
 
 class Discriminator(nn.Module):
