@@ -73,7 +73,7 @@ def train_basic_gan(options):
     if options.dataset is None:
         img_size = 28
         basic_tsfm = get_basic_transform(img_size)
-        dataset = datasets.FashionMNIST(root='dataset/', transform=basic_tsfm, dowload=True)
+        dataset = datasets.FashionMNIST(root='dataset/', transform=basic_tsfm, download=True)
         img_dim = 1*img_size*img_size
 
     z_dim = options.z_dim
