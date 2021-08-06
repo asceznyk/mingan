@@ -115,7 +115,6 @@ def train_basic_gan(options):
             plt_imgs(fake_imgs.detach().cpu().numpy(), batch_size)
 
         pg = disc(gen(noises))
-        print(pg)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
