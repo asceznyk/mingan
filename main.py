@@ -1,11 +1,13 @@
 import os
 import math
 import argparse
+
 import PIL
+from PIL import Image
 
 import numpy as np
 
-from PIL import Image
+import matplotlib.pyplot as plt
 
 import torch
 import torch.nn as nn
@@ -69,6 +71,16 @@ class Generator(nn.Module):
     def forward(self, x):
         return self.gen(x)
 
+def plt_imgs(imgs, batch_size):
+    rows, cols = 4, batch_size // 4
+    fig, axs = plt.subplots(rows, cols)
+
+    for r in range(rows):
+        for c in range(cols):
+            img = imgs[(r * cols + c % cols)]
+            axs[r, c].imshow(img, cmap='gray')
+
+
 def train_basic_gan(options):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -78,11 +90,17 @@ def train_basic_gan(options):
         dataset = datasets.FashionMNIST(root='dataset/', transform=basic_tsfm, download=True)
         img_dim = 1*img_size*img_size
 
+    lr = 3e-4
     batch_size = options.batch_size
     z_dim = options.z_dim
+
     disc = Discriminator(img_dim)
     gen = Generator(z_dim, img_dim)
     disc, gen = disc.to(device), gen.to(device)
+
+    criterion = nn.BCELoss()
+    optim_disc = optim.Adam(disc.parameters(), lr=lr)
+    optim_gen = optim.Adam(gen.parameters(), lr=lr)
 
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
@@ -90,6 +108,12 @@ def train_basic_gan(options):
         imgs = imgs.view(-1, img_dim).to(device)
         noises = get_random_noise(z_dim, batch_size)
         px = disc(imgs)
+
+        if b <= 0:
+            fake_imgs = gen(noises)
+            fake_imgs = fake_imgs.view(-1, 1, img_size, img_size).detach().cpu().numpy()
+            plt_imgs(fake_imgs, batch_size)
+
         pg = disc(gen(noises))
         print(pg)
 
