@@ -125,6 +125,8 @@ def train_basic_gan(options):
                 loss_d.backward(retain_graph=True)
                 optim_disc.step()
 
+            print(f'discriminator loss at epoch {e} batch {b} = {loss_d.item()}')
+
             fake_imgs = gen(get_random_noise(z_dim, batch_size))
             pg = disc(fake_imgs)
 
@@ -132,6 +134,8 @@ def train_basic_gan(options):
             gen.zero_grad()
             loss_g.backward()
             optim_gen.step()
+
+            print(f'generator loss at epoch {e} batch {b} = {loss_g.item()}')
 
             if e >= epochs-1 and b <= 0:
                 real_imgs = real_imgs.view(-1, img_size, img_size)
