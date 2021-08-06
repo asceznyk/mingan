@@ -115,7 +115,7 @@ def train_basic_gan(options):
             fake_imgs = gen(noises)
             fake_imgs = fake_imgs.view(-1, img_size, img_size)
             plt_imgs(fake_imgs.detach().cpu().numpy(), batch_size, 'fakeimgs.png')
-            realimgs = real_imgs.view(-1, img_size, img_size)
+            real_imgs = real_imgs.view(-1, img_size, img_size)
             plt_imgs(real_imgs.detach().cpu().numpy(), batch_size, 'realimgs.png')
 
         pg = disc(gen(noises))
