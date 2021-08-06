@@ -82,8 +82,7 @@ def plt_imgs(imgs, batch_size):
             img = imgs[(r * cols + c % cols)]
             axs[r, c].imshow(img*255, cmap='gray')
 
-    plt.show()
-    plt.savefig('sampleimgs.png')
+    plt.savefig('sampleimgs.png', dpi=fig.dpi)
 
 
 def train_basic_gan(options):
