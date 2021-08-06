@@ -86,6 +86,7 @@ def train_basic_gan(options):
     loader = DataLoader(dataset, batch_size=options.batch_size, shuffle=True)
 
     for b, (imgs, _) in enumerate(loader):
+        print(imgs.size())
         px = disc(imgs.to(device))
         print(px)
 
