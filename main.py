@@ -75,11 +75,10 @@ def plt_imgs(imgs, batch_size):
     rows, cols = 4, batch_size // 4
     fig, axs = plt.subplots(rows, cols, figsize=(30, 30))
 
-    print(rows, cols)
-
     for r in range(rows):
         for c in range(cols):
             img = imgs[(r * cols + c % cols)]
+            print(r * cols + c % cols)
             axs[r, c].imshow(img, cmap='gray')
 
 
