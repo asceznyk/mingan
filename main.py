@@ -71,18 +71,16 @@ class Generator(nn.Module):
     def forward(self, x):
         return self.gen(x)
 
-def plt_imgs(imgs, batch_size):
+def plt_imgs(imgs, batch_size, save_path):
     rows, cols = 4, batch_size // 4
     fig, axs = plt.subplots(rows, cols)
-
-    print(imgs.shape)
 
     for r in range(rows):
         for c in range(cols):
             img = imgs[(r * cols + c % cols)]
-            axs[r, c].imshow(img*255, cmap='gray')
+            axs[r, c].imshow(img, cmap='gray')
 
-    plt.savefig('sampleimgs.png', dpi=fig.dpi)
+    plt.savefig(save_path, dpi=fig.dpi)
 
 
 def train_basic_gan(options):
@@ -108,15 +106,17 @@ def train_basic_gan(options):
 
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-    for b, (imgs, _) in enumerate(loader):
-        imgs = imgs.view(-1, img_dim).to(device)
+    for b, (real_imgs, _) in enumerate(loader):
+        real_imgs = real_imgs.view(-1, img_dim).to(device)
         noises = get_random_noise(z_dim, batch_size)
         px = disc(imgs)
 
         if b <= 0:
             fake_imgs = gen(noises)
-            fake_imgs = fake_imgs.view(-1, 1, img_size, img_size).squeeze(1)
-            plt_imgs(fake_imgs.detach().cpu().numpy(), batch_size)
+            fake_imgs = fake_imgs.view(-1, img_size, img_size)
+            plt_imgs(fake_imgs.detach().cpu().numpy(), batch_size, 'fakeimgs.png')
+            realimgs = real_imgs.view(-1, img_size, img_size)
+            plt_imgs(real_imgs.detach().cpu().numpy(), batch_size, 'realimgs.png')
 
         pg = disc(gen(noises))
 
