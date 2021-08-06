@@ -73,7 +73,9 @@ class Generator(nn.Module):
 
 def plt_imgs(imgs, batch_size):
     rows, cols = 4, batch_size // 4
-    fig, axs = plt.subplots(rows, cols, figsize=(30, 30))
+    fig, axs = plt.subplots(rows, cols)
+
+    print(imgs.shape)
 
     for r in range(rows):
         for c in range(cols):
