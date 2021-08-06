@@ -108,7 +108,7 @@ def train_basic_gan(options):
 
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-    for e in epochs:
+    for e in range(epochs):
         for b, (real_imgs, _) in enumerate(loader):
             real_imgs = real_imgs.view(-1, img_dim).to(device)
             fake_imgs = gen(get_random_noise(z_dim, batch_size))
