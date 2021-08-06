@@ -80,6 +80,8 @@ def plt_imgs(imgs, batch_size):
             img = imgs[(r * cols + c % cols)]
             axs[r, c].imshow(img, cmap='gray')
 
+    plt.show()
+
 
 def train_basic_gan(options):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
