@@ -97,20 +97,26 @@ def train_gan(options):
     z_dim = options.z_dim
     mode = options.mode
 
-    tsfm = get_transform(options.img_size)
+    tsfm = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Resize((img_size, img_size)),
+    ])
 
     if options.dataset is None:
         dataset = datasets.FashionMNIST(root='dataset/', transform=tsfm, download=True)
     else:
         dataset = ImageDir(options.dataset, tsfm)
 
-    disc, gen, noise, lr, img_dim = init_gan(mode, img_size, z_dim, batch_size, dataset[0][0].size(0))
+    nc = dataset[0][0].size(0)
+    disc, gen, noise, lr, img_dim = init_gan(mode, img_size, z_dim, batch_size, nc)
     criterion = nn.BCELoss()
     optim_disc, optim_gen = init_opt(mode, disc, gen, lr)
 
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
-    for e in range(epochs):
+    for e in range(1, epochs+1):
         for b, (real_imgs, _) in tqdm(enumerate(loader), total=len(loader)):
+            norm_means, norm_stds = ([0.5 for _ in range(nc)]  for _ in range(2))
+            real_imgs = transforms.functional.normalize(real_imgs, norm_means, norm_stds)
             for k in range(k_steps):
                 real_imgs = real_imgs.view(-1, img_dim).to(device)
                 fake_imgs = gen(noise()).to(device)
