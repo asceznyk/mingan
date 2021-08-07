@@ -63,6 +63,31 @@ class DCDisc(nn.Module):
     def forward(self, x):
         return self.disc(x)
 
+class DCGen(nn.Module):
+    def __init__(self, img_dim, z_dim, f_gen=64):
+        super(DCGen, self).__init__()
+        nc, nw, nh = img_dim
+        self.gen = nn.Sequential(
+            nn.ConvTranspose2d(z_dim, f_gen * 16, 4, 2, 1), #32x32, 128 if(img_size=64)
+            nn.ReLU(),
+            self._block(f_gen * 2, f_gen * 4, 4, 2, 1), #16x16, 256
+            self._block(f_gen * 4, f_gen * 8, 4, 2, 1), #8x8, 512
+            self._block(f_gen * 8, f_gen * 16, 4, 2, 1), #4x4, 1024
+            nn.Conv2d(f_gen * 16, 1, 4, 2, 0), #1x1, 1
+            nn.Sigmoid(),
+            nn.Flatten()
+        )
+
+    def _block(self, in_channels, out_channels, kernel_size, stride, pad):
+        return nn.Sequential(
+            nn.ConvTranspose2d(in_channels, out_channels, kernel_size, stride, pad, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU()
+        )
+
+    def forward(self, x):
+        return self.gen(x)
+
 class  DCGAN:
     def __init__(self, img_dim, z_dim, f_disc=64, f_gen=64):
         self.disc = DCDisc(img_dim, f_disc)
