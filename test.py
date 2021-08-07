@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 
-m = nn.Conv2d(1024, 1, 4, 1, 0)
+m = nn.Conv2d(1024, 1, 4, 2, 1)
 input = torch.randn(1, 1024, 4, 4)
 output = m(input)
 
