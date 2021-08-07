@@ -21,9 +21,16 @@ import torchvision.datasets as datasets
 
 from torch.utils.data import Dataset, DataLoader
 
-def get_random_noise(dim, batch_size=1): return torch.randn((batch_size, dim))
+from models import *
 
-def get_basic_transform(size):
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+def get_random_noise(dim, batch_size=1, single=True):
+    n = torch.randn((batch_size, dim))
+    n = n if single else n.view(batch_size, z_dim, 1, 1)
+    return n.to(device)
+
+def get_transform(size):
     return transforms.Compose([
         transforms.ToTensor(),
         transforms.Resize((size, size)),
@@ -31,12 +38,10 @@ def get_basic_transform(size):
     ])
 
 class ImageDir(Dataset):
-    def __init__(self, dirctry, transform, z_dim=64):
+    def __init__(self, dirctry, transform):
         self.dirctry = dirctry
         self.files = [dirctry+'/'+f for f in os.listdir(dirctry)]
         self.transform = transform
-
-        self.z_dim = z_dim
 
     def __len__(self):
         return len(self.files)
@@ -45,34 +50,6 @@ class ImageDir(Dataset):
         img = Image.open(self.files[i])
         return self.transform(img), 1
 
-class Discriminator(nn.Module):
-    def __init__(self, img_dim):
-        super().__init__()
-        self.img_dim = img_dim
-        self.disc = nn.Sequential(
-            nn.Linear(img_dim, 128),
-            nn.LeakyReLU(0.01),
-            nn.Linear(128, 1),
-            nn.Sigmoid()
-        )
-
-    def forward(self, x):
-        return self.disc(x)
-
-class Generator(nn.Module):
-    def __init__(self, z_dim, img_dim):
-        super().__init__()
-        self.z_dim = z_dim
-        self.gen = nn.Sequential(
-            nn.Linear(z_dim, 256),
-            nn.LeakyReLU(0.01),
-            nn.Linear(256, img_dim),
-            nn.Tanh()
-        )
-
-    def forward(self, x):
-        return self.gen(x)
-
 def plt_imgs(imgs, batch_size, save_path):
     rows, cols = 4, batch_size // 4
     fig, axs = plt.subplots(rows, cols)
@@ -80,40 +57,58 @@ def plt_imgs(imgs, batch_size, save_path):
     for r in range(rows):
         for c in range(cols):
             img = imgs[(r * cols + c % cols)]
-            axs[r, c].imshow(img, cmap='gray')
+            axs[r, c].imshow(img)
 
     plt.savefig(save_path, dpi=fig.dpi)
 
+def init_gan(mode, img_size, z_dim, batch_size, nc):
+    if mode == 'dcgan':
+        lr = 2e-4
+        img_dim = (nc, img_size, img_size)
+        gan = DCGAN(img_dim, z_dim, f_disc=64, f_gen=64)
+        single = False
+    else:
+        if mode != 'fcgan':
+            print('mode is not specified so training an FCGAN')
+        lr = 3e-4
+        img_dim = nc * img_size * img_size
+        gan = FCGAN(img_dim, z_dim)
+        single = True
 
-def train_basic_gan(options):
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    noise = lambda : get_random_noise(z_dim, batch_size, single=single)
 
-    lr = options.lr
+    return gan.disc.to(device), gan.gen.to(device), noise, lr, img_dim
+
+def init_opt(mode, disc, gen, lr):
+    betas = (0.9, 0.999)
+    if mode == 'dcgan':
+        betas = (0.5, 0.999)
+
+    optim_disc = optim.Adam(disc.parameters(), lr=lr, betas=betas)
+    optim_gen = optim.Adam(gen.parameters(), lr=lr, betas=betas)
+
+    return optim_disc, optim_gen
+
+def train_gan(options):
     img_size = options.img_size
-    z_dim = options.z_dim
     batch_size = options.batch_size
     epochs = options.epochs
     k_steps = options.k_steps
-    img_dim = 1*img_size*img_size
+    z_dim = options.z_dim
+    mode = options.mode
 
-    basic_tsfm = get_basic_transform(options.img_size)
+    tsfm = get_transform(options.img_size)
 
     if options.dataset is None:
-        dataset = datasets.MNIST(root='dataset/', transform=basic_tsfm, download=True)
+        dataset = datasets.MNIST(root='dataset/', transform=tsfm, download=True)
     else:
-        dataset = ImageDir(options.dataset, basic_tsfm, z_dim)
+        dataset = ImageDir(options.dataset, tsfm)
 
-    disc = Discriminator(img_dim)
-    gen = Generator(z_dim, img_dim)
-    disc, gen = disc.to(device), gen.to(device)
-
+    disc, gen, noise, lr, img_dim = init_gan(mode, img_size, z_dim, batch_size, dataset[0][0].size(0))
     criterion = nn.BCELoss()
-    optim_disc = optim.Adam(disc.parameters(), lr=lr)
-    optim_gen = optim.Adam(gen.parameters(), lr=lr)
+    optim_disc, optim_gen = init_opt(mode, disc, gen, lr)
 
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
-    noise = lambda : get_random_noise(z_dim, batch_size).to(device)
-
     for e in range(epochs):
         for b, (real_imgs, _) in tqdm(enumerate(loader), total=len(loader)):
             for k in range(k_steps):
@@ -156,16 +151,16 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--dataset', type=str, help='path to image folder you want to train on', default=None)
+    parser.add_argument('--mode', type=str, help='you can choose to train a fully connected GAN or a deep convolutional GAN (options : [fcgan, dcgan])', default='fcgan')
     parser.add_argument('--img_size', type=int,  help='image size', default=28)
     parser.add_argument('--batch_size', type=int, help='batch size', default=32)
     parser.add_argument('--z_dim', type=int, help='dimensionality of noise', default=64)
     parser.add_argument('--k_steps', type=int, help='number of steps to train discriminator', default=1)
     parser.add_argument('--epochs', type=int, help='number of epochs to train model', default=30)
-    parser.add_argument('--lr', type=float, help='learning rate', default=3e-4)
 
     options = parser.parse_args()
 
     print(options)
 
-    train_basic_gan(options)
+    train_gan(options)
 
