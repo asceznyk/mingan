@@ -10,5 +10,5 @@ from models import *
 img_dim = (3, 64, 64)
 disc = DCDisc(img_dim)
 
-out = disc(torch.randn(10, *img_dim))
+out = disc(torch.randn(1, *img_dim))
 print(out, out.size())
