@@ -36,5 +36,5 @@ class FCGen(nn.Module):
 class FCGAN:
     def __init__(self, img_dim, z_dim):
         self.disc = FCDisc(img_dim)
-        self.gen = FCGen(z_dim)
+        self.gen = FCGen(z_dim, img_dim)
 
