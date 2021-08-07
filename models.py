@@ -38,5 +38,5 @@ class FCGAN:
         self.disc = FCDisc(img_dim)
         self.gen = FCGen(z_dim, img_dim)
 
-class DCDisc(nn.Module):
-    def __init__(self, img_dim, f_disc)
+#class DCDisc(nn.Module):
+#    def __init__(self, img_dim, f_disc)
