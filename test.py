@@ -13,7 +13,7 @@ disc = DCDisc(img_dim)
 out = disc(torch.randn(1, *img_dim))
 print(out, out.size())
 
-m = nn.ConvTranspose2d(100, 1024, 5, 2, 1)
+m = nn.ConvTranspose2d(100, 1024, 6, 2, 1)
 inp = torch.randn(1, 100, 1, 1)
 out = m(inp)
 
