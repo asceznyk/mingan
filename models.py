@@ -56,7 +56,7 @@ class DCDisc(nn.Module):
     def _block(self, in_channels, out_channels, kernel_size, stride, pad):
         return nn.Sequential(
             nn.Conv2d(in_channels, out_channels, kernel_size, stride, pad, bias=False),
-            nn.BatchNorm2d(),
+            nn.BatchNorm2d(out_channels),
             nn.LeakyReLU(0.2)
         )
 
