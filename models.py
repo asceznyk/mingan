@@ -39,26 +39,29 @@ class FCGAN:
         self.gen = FCGen(z_dim, img_dim)
 
 class DCDisc(nn.Module):
-    def __init__(self, img_dim, f_disc):
+    def __init__(self, img_dim, f_disc=64):
         super(DCDisc, self).__init__()
         nc, nw, nh = img_dim
         self.disc = nn.Sequential(
-            self._block(nc, f_disc * 2, 2, 1, 0), #32x32, 128
-            self._block(f_disc * 2, f_disc * 4, 2, 1, 0), #16x16, 256
-            self._block(f_disc * 4, f_disc * 8, 2, 1, 0), #8x8, 512
-            self._block(f_disc * 8, f_disc * 16, 2, 1, 0), #4x4, 1024
-            nn.AdaptiveAvgPool2d(1)
+            nn.Conv2d(nc, f_disc * 2, 4, 2, 1), #32x32, 128 if(img_size=64)
+            nn.LeakyReLU(0.2),
+            self._block(f_disc * 2, f_disc * 4, 4, 2, 1), #16x16, 256
+            self._block(f_disc * 4, f_disc * 8, 4, 2, 1), #8x8, 512
+            self._block(f_disc * 8, f_disc * 16, 2, 1, 1), #4x4, 1024
+            nn.Conv2d(f_disc * 16, 1, 4, 2, 0), #1x1, 1
+            nn.Sigmoid(),
+            nn.Flatten()
         )
 
     def _block(self, in_channels, out_channels, kernel_size, stride, pad):
         return nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, kernel_size, stride, pad, bias=0),
+            nn.Conv2d(in_channels, out_channels, kernel_size, stride, pad, bias=False),
+            nn.BatchNorm2d(),
             nn.LeakyReLU(0.2)
         )
 
     def forward(self, x):
         return self.disc(x)
-
 
 class  DCGAN:
     def __init__(self, img_dim, z_dim, f_disc=64, f_gen=64):

@@ -5,9 +5,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+img_dim = (3, 64, 64)
+disc = DCDisc(img_dim)
 
-m = nn.Conv2d(1024, 1, 4, 2, 0)
-input = torch.randn(1, 1024, 4, 4)
-output = m(input)
-
-print(input.size(), output.size())
+out = disc(torch.randn(1, *img_dim))
+print(out)
