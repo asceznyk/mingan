@@ -11,4 +11,4 @@ img_dim = (3, 64, 64)
 disc = DCDisc(img_dim)
 
 out = disc(torch.randn(1, *img_dim))
-print(out)
+print(out, out.size())

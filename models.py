@@ -50,7 +50,7 @@ class DCDisc(nn.Module):
             self._block(f_disc * 8, f_disc * 16, 2, 1, 1), #4x4, 1024
             nn.Conv2d(f_disc * 16, 1, 4, 2, 0), #1x1, 1
             nn.Sigmoid(),
-            nn.Flatten()
+            #nn.Flatten()
         )
 
     def _block(self, in_channels, out_channels, kernel_size, stride, pad):
