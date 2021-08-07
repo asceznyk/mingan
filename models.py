@@ -47,9 +47,9 @@ class DCDisc(nn.Module):
             nn.LeakyReLU(0.2),
             self._block(f_disc * 2, f_disc * 4, 4, 2, 1), #16x16, 256
             self._block(f_disc * 4, f_disc * 8, 4, 2, 1), #8x8, 512
-            self._block(f_disc * 8, f_disc * 16, 2, 1, 1), #4x4, 1024
-            #nn.Conv2d(f_disc * 16, 1, 4, 2, 0), #1x1, 1
-            #nn.Sigmoid(),
+            self._block(f_disc * 8, f_disc * 16, 4, 2, 1), #4x4, 1024
+            nn.Conv2d(f_disc * 16, 1, 4, 2, 0), #1x1, 1
+            nn.Sigmoid(),
             #nn.Flatten()
         )
 
