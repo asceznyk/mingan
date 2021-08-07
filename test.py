@@ -5,6 +5,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+from models import *
+
 img_dim = (3, 64, 64)
 disc = DCDisc(img_dim)
 
