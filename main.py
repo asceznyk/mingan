@@ -112,6 +112,8 @@ def train_gan(options):
     optim_disc = optim.Adam(disc.parameters(), lr=lr, betas=betas)
     optim_gen = optim.Adam(gen.parameters(), lr=lr, betas=betas)
 
+    gen.train()
+    disc.train()
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
     for e in range(1, epochs+1):
         for b, (real_imgs, _) in tqdm(enumerate(loader), total=len(loader)):
