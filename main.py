@@ -64,7 +64,7 @@ def plt_imgs(imgs, batch_size, save_path):
 def init_dataset(mode, tsfm):
     root = 'dataset/'
     if mode == 'dcgan':
-        dataset = datasets.CIFAR10(root=root, train=False, download=True, transform=tsfm)
+        dataset = datasets.CIFAR10(root=root, train=True, download=True, transform=tsfm)
     else:
         dataset = datasets.FashionMNIST(root=root, transform=tsfm, download=True)
     return dataset
