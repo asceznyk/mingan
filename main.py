@@ -142,15 +142,15 @@ def train_gan(options):
             loss_g.backward()
             optim_gen.step()
 
-            if e % 10 == 0 and b == 0:
+            if b % 100 == 0:
                 real_imgs = real_imgs.view(-1, img_size, img_size)
                 real_imgs = real_imgs.detach().cpu().numpy()
-                plt_imgs(real_imgs, 32, f'realimgs{e}.png')
+                plt_imgs(real_imgs, 32, f'realimgs{b}.png')
 
                 with torch.no_grad():
                     fake_imgs = gen(noise())
                     fake_imgs = fake_imgs.view(-1, img_size, img_size).detach().cpu().numpy()
-                    plt_imgs(fake_imgs, 32, f'fakeimgs{e}.png')
+                    plt_imgs(fake_imgs, 32, f'fakeimgs{b}.png')
 
         print(f'discriminator loss at epoch {e} = {loss_d.item()}')
         print(f'generator loss at epoch {e} = {loss_g.item()}')
