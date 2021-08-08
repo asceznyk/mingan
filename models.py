@@ -5,6 +5,12 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+def init_weights(model):
+    # Initializes weights according to the DCGAN paper
+    for m in model.modules():
+        if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d, nn.BatchNorm2d)):
+            nn.init.normal_(m.weight.data, 0.0, 0.02)
+
 class FCDisc(nn.Module):
     def __init__(self, img_dim):
         super(FCDisc, self).__init__()
@@ -91,4 +97,7 @@ class  DCGAN:
     def __init__(self, img_dim, z_dim, f_disc=64, f_gen=64):
         self.disc = DCDisc(img_dim, f_disc)
         self.gen = DCGen(img_dim, z_dim, f_gen)
+        init_weights(self.disc)
+        init_weights(self.gen)
+
 
