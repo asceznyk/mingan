@@ -126,7 +126,7 @@ def train_gan(options):
 
                 loss_dx = criterion(px, torch.ones_like(px)) #log(d(x))
                 loss_dg = criterion(pg, torch.zeros_like(pg)) #log((1 - d(g(z))))
-                loss_d = (loss_dx + loss_dg)
+                loss_d = (loss_dx + loss_dg) / 2
 
                 disc.zero_grad()
                 loss_d.backward(retain_graph=True)
