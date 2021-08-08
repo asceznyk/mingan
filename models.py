@@ -66,16 +66,15 @@ class DCDisc(nn.Module):
 class DCGen(nn.Module):
     def __init__(self, img_dim, z_dim, f_gen=64):
         super(DCGen, self).__init__()
-        nc, nw, nh = img_dim
+        nc, _, _ = img_dim
         self.gen = nn.Sequential(
-            nn.ConvTranspose2d(z_dim, f_gen * 16, 4, 2, 1), #32x32, 128 if(img_size=64)
+            nn.ConvTranspose2d(z_dim, f_gen * 16, 4, 1, 0), #4x4, 1024 if(img_size=64)
             nn.ReLU(),
-            self._block(f_gen * 2, f_gen * 4, 4, 2, 1), #16x16, 256
-            self._block(f_gen * 4, f_gen * 8, 4, 2, 1), #8x8, 512
-            self._block(f_gen * 8, f_gen * 16, 4, 2, 1), #4x4, 1024
-            nn.Conv2d(f_gen * 16, 1, 4, 2, 0), #1x1, 1
-            nn.Sigmoid(),
-            nn.Flatten()
+            self._block(f_gen * 16, f_gen * 8, 5, 1, 1), #8x8, 512
+            self._block(f_gen * 8, f_gen * 4, 4, 2, 1), #16x16, 256
+            self._block(f_gen * 4, f_gen * 2, 4, 2, 1), #32x32, 128
+            nn.ConvTranspose2d(f_gen * 2, nc, 4, 2, 1), #64x64, nc
+            nn.Tanh(),
         )
 
     def _block(self, in_channels, out_channels, kernel_size, stride, pad):

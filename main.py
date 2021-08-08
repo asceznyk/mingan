@@ -61,11 +61,19 @@ def plt_imgs(imgs, batch_size, save_path):
 
     plt.savefig(save_path, dpi=fig.dpi)
 
+def init_dataset(mode, tsfm):
+    root = 'dataset/'
+    if mode == 'dcgan':
+        dataset = datasets.CIFAR10(root=root, train=True, download=True, transform=tsfm)
+    else:
+        dataset = datasets.FashionMNIST(root=root, transform=tsfm, download=True)
+    return dataset
+
 def init_gan(mode, img_size, z_dim, batch_size, nc):
     if mode == 'dcgan':
         lr = 2e-4
         img_dim = (nc, img_size, img_size)
-        gan = DCGAN(img_dim, z_dim, f_disc=64, f_gen=64)
+        gan = DCGAN(img_dim, z_dim)
         single = False
     else:
         if mode != 'fcgan':
@@ -78,16 +86,6 @@ def init_gan(mode, img_size, z_dim, batch_size, nc):
     noise = lambda : get_random_noise(z_dim, batch_size, single=single)
 
     return gan.disc.to(device), gan.gen.to(device), noise, lr, img_dim
-
-def init_opt(mode, disc, gen, lr):
-    betas = (0.9, 0.999)
-    if mode == 'dcgan':
-        betas = (0.5, 0.999)
-
-    optim_disc = optim.Adam(disc.parameters(), lr=lr, betas=betas)
-    optim_gen = optim.Adam(gen.parameters(), lr=lr, betas=betas)
-
-    return optim_disc, optim_gen
 
 def train_gan(options):
     img_size = options.img_size
@@ -103,14 +101,16 @@ def train_gan(options):
     ])
 
     if options.dataset is None:
-        dataset = datasets.FashionMNIST(root='dataset/', transform=tsfm, download=True)
+        dataset = init_dataset(mode, tsfm)
     else:
         dataset = ImageDir(options.dataset, tsfm)
 
     nc = dataset[0][0].size(0)
     disc, gen, noise, lr, img_dim = init_gan(mode, img_size, z_dim, batch_size, nc)
     criterion = nn.BCELoss()
-    optim_disc, optim_gen = init_opt(mode, disc, gen, lr)
+    betas = (0.9, 0.999) if mode == 'dcgan' else (0.5, 0.999)
+    optim_disc = optim.Adam(disc.parameters(), lr=lr, betas=betas)
+    optim_gen = optim.Adam(gen.parameters(), lr=lr, betas=betas)
 
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
     for e in range(1, epochs+1):
