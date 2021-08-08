@@ -121,6 +121,8 @@ def train_gan(options):
                 real_imgs = real_imgs.view(-1, *img_dim).to(device)
                 fake_imgs = gen(noise()).to(device)
 
+                print(real_imgs.size())
+
                 px = disc(real_imgs)
                 pg = disc(fake_imgs)
 
