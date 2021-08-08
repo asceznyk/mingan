@@ -74,7 +74,7 @@ class DCGen(nn.Module):
         super(DCGen, self).__init__()
         nc, _, _ = img_dim
         self.gen = nn.Sequential(
-            self._block(z_dim, f_gen * 16, 4, 1, 0) #1x1, 100
+            self._block(z_dim, f_gen * 16, 4, 1, 0), #1x1, 100
             self._block(f_gen * 16, f_gen * 8, 4, 2, 1), #8x8, 512
             self._block(f_gen * 8, f_gen * 4, 4, 2, 1), #16x16, 256
             self._block(f_gen * 4, f_gen * 2, 4, 2, 1), #32x32, 128
