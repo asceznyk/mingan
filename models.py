@@ -70,7 +70,7 @@ class DCGen(nn.Module):
         self.gen = nn.Sequential(
             nn.ConvTranspose2d(z_dim, f_gen * 16, 4, 1, 0), #4x4, 1024 if(img_size=64)
             nn.ReLU(),
-            self._block(f_gen * 16, f_gen * 8, 5, 1, 1), #8x8, 512
+            self._block(f_gen * 16, f_gen * 8, 4, 2, 1), #8x8, 512
             self._block(f_gen * 8, f_gen * 4, 4, 2, 1), #16x16, 256
             self._block(f_gen * 4, f_gen * 2, 4, 2, 1), #32x32, 128
             nn.ConvTranspose2d(f_gen * 2, nc, 4, 2, 1), #64x64, nc
