@@ -27,7 +27,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def get_random_noise(dim, batch_size=1, single=True):
     n = torch.randn((batch_size, dim))
-    n = n if single else n.view(batch_size, z_dim, 1, 1)
+    n = n if single else n.view(batch_size, dim, 1, 1)
     return n.to(device)
 
 def get_transform(size):
