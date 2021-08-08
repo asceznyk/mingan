@@ -79,7 +79,7 @@ def init_gan(mode, img_size, z_dim, batch_size, nc):
         if mode != 'fcgan':
             print('mode is not specified so training an FCGAN')
         lr = 3e-4
-        img_dim = nc * img_size * img_size
+        img_dim = (nc * img_size * img_size, )
         gan = FCGAN(img_dim, z_dim)
         single = True
 
@@ -118,7 +118,7 @@ def train_gan(options):
             norm_means, norm_stds = ([0.5 for _ in range(nc)]  for _ in range(2))
             real_imgs = transforms.functional.normalize(real_imgs, norm_means, norm_stds)
             for k in range(k_steps):
-                real_imgs = real_imgs.view(-1, img_dim).to(device)
+                real_imgs = real_imgs.view(-1, *img_dim).to(device)
                 fake_imgs = gen(noise()).to(device)
 
                 px = disc(real_imgs)
