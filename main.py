@@ -56,7 +56,6 @@ def plt_imgs(imgs, batch_size, save_path):
 
     for r in range(rows):
         for c in range(cols):
-            print(r * cols + c % cols)
             img = imgs[(r * cols + c % cols)]
             axs[r, c].imshow(img)
 
@@ -145,13 +144,13 @@ def train_gan(options):
             optim_gen.step()
 
             if b % 100 == 0:
-                real_imgs = real_imgs.view(-1, img_size, img_size)
+                real_imgs = real_imgs.view(-1, nc, img_size, img_size)
                 real_imgs = real_imgs.detach().cpu().numpy()
                 plt_imgs(real_imgs, 32, f'realimgs{b}.png')
 
                 with torch.no_grad():
                     fake_imgs = gen(noise())
-                    fake_imgs = fake_imgs.view(-1, img_size, img_size).detach().cpu().numpy()
+                    fake_imgs = fake_imgs.view(-1, nc, img_size, img_size).detach().cpu().numpy()
                     plt_imgs(fake_imgs, 32, f'fakeimgs{b}.png')
 
         print(f'discriminator loss at epoch {e} = {loss_d.item()}')
