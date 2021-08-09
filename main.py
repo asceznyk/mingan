@@ -61,7 +61,7 @@ def plt_imgs(imgs, batch_size, save_path):
             if img.shape[2] == 1:
                 img = img[:,:,0]
             else:
-                img = img[img > 0]
+                img = img.clip(min=0)
 
             axs[r, c].imshow(img)
 
