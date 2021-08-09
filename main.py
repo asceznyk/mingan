@@ -78,6 +78,8 @@ def init_gan(mode, img_size, z_dim, batch_size, nc):
         lr = 2e-4
         img_dim = (nc, img_size, img_size)
         gan = DCGAN(img_dim, z_dim)
+        init_weights(gan.disc)
+        init_weights(gan.gen)
         single = False
     else:
         if mode != 'fcgan':
