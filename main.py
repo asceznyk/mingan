@@ -84,7 +84,7 @@ def init_gan(mode, img_size, z_dim, batch_size, nc):
             print('mode is not specified so training an FCGAN')
         lr = 3e-4
         img_dim = (nc * img_size * img_size, )
-        gan = FCGAN(img_dim, z_dim)
+        gan = FCGAN(img_dim[0], z_dim)
         single = True
 
     noise = lambda : get_random_noise(z_dim, batch_size, single=single)
