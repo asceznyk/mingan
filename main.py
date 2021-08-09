@@ -60,6 +60,8 @@ def plt_imgs(imgs, batch_size, save_path):
             img = np.transpose(img, (1,2,0))
             if img.shape[2] == 1:
                 img = img[:,:,0]
+            else:
+                img = img[img > 0]
 
             axs[r, c].imshow(img)
 
