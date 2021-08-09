@@ -121,8 +121,9 @@ def train_gan(options):
     gen.train()
     disc.train()
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    pbar = tqdm(enumerate(loader), total=len(loader))
     for e in range(1, epochs+1):
-        for b, (real_imgs, _) in tqdm(enumerate(loader), total=len(loader)):
+        for b, (real_imgs, _) in pbar:
             norm_means, norm_stds = ([0.5 for _ in range(nc)]  for _ in range(2))
             real_imgs = transforms.functional.normalize(real_imgs, norm_means, norm_stds)
             for k in range(k_steps):
@@ -159,8 +160,8 @@ def train_gan(options):
                     fake_imgs = fake_imgs.view(-1, nc, img_size, img_size).detach().cpu().numpy()
                     plt_imgs(fake_imgs, 32, f'fakeimgs{b}.png')
 
-        print(f'discriminator loss at epoch {e} = {loss_d.item()}')
-        print(f'generator loss at epoch {e} = {loss_g.item()}')
+            pbar.set_description(f'discriminator loss at epoch {e} = {loss_d.item().:4f}')
+            pbar.set_description(f'generator loss at epoch {e} = {loss_g.item().:4f}')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
