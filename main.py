@@ -56,7 +56,7 @@ def plt_imgs(imgs, batch_size, save_path):
 
     for r in range(rows):
         for c in range(cols):
-            print(r * cols, + c % cols)
+            print(r * cols + c % cols)
             img = imgs[(r * cols + c % cols)]
             axs[r, c].imshow(img)
 
