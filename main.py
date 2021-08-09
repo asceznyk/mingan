@@ -123,8 +123,8 @@ def train_gan(options):
     gen.train()
     disc.train()
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
-    pbar = tqdm(enumerate(loader), total=len(loader))
     for e in range(1, epochs+1):
+        pbar = tqdm(enumerate(loader), total=len(loader))
         for b, (real_imgs, _) in pbar:
             norm_means, norm_stds = ([0.5 for _ in range(nc)]  for _ in range(2))
             real_imgs = transforms.functional.normalize(real_imgs, norm_means, norm_stds)
