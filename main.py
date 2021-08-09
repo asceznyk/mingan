@@ -114,7 +114,7 @@ def train_gan(options):
     nc = dataset[0][0].size(0)
     disc, gen, noise, lr, img_dim = init_gan(mode, img_size, z_dim, batch_size, nc)
     criterion = nn.BCELoss()
-    betas = (0.9, 0.999) if mode == 'dcgan' else (0.5, 0.999)
+    betas = (0.5, 0.999) if mode == 'dcgan' else (0.9, 0.999)
     optim_disc = optim.Adam(disc.parameters(), lr=lr, betas=betas)
     optim_gen = optim.Adam(gen.parameters(), lr=lr, betas=betas)
 
