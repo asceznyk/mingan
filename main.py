@@ -160,8 +160,8 @@ def train_gan(options):
                     fake_imgs = fake_imgs.view(-1, nc, img_size, img_size).detach().cpu().numpy()
                     plt_imgs(fake_imgs, 32, f'fakeimgs{b}.png')
 
-            pbar.set_description(f'discriminator loss at epoch {e} = {loss_d.item().:4f}')
-            pbar.set_description(f'generator loss at epoch {e} = {loss_g.item().:4f}')
+            pbar.set_description(f'discriminator loss at epoch {e} = {loss_d.item():.4f}')
+            pbar.set_description(f'generator loss at epoch {e} = {loss_g.item():.4f}')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
