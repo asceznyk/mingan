@@ -154,13 +154,17 @@ def train_gan(options):
 
             if b % 100 == 0:
                 real_imgs = real_imgs.view(-1, nc, img_size, img_size)
-                real_imgs = real_imgs.detach().cpu().numpy()
-                plt_imgs(real_imgs, 32, f'realimgs{b}.png')
+                #real_imgs = real_imgs.detach().cpu().numpy()
+                #plt_imgs(real_imgs, 32, f'realimgs{b}.png')
+                img_grid_real = torchvision.utils.make_grid(real_imgs[:32], normalize=True)
+                torchvision.utils.save_img(img_grid_real, 'realimgs{b}.png')
 
                 with torch.no_grad():
-                    fake_imgs = gen(noise())
-                    fake_imgs = fake_imgs.view(-1, nc, img_size, img_size).detach().cpu().numpy()
-                    plt_imgs(fake_imgs, 32, f'fakeimgs{b}.png')
+                    fake_imgs = gen(noise()).view(-1, nc, img_size, img_size)
+                    #fake_imgs = fake_imgs.detach().cpu().numpy()
+                    #plt_imgs(fake_imgs, 32, f'fakeimgs{b}.png')
+                    img_grid_fake = torchvision.utils.make_grid(fake_imgs[:32], normalize=True)
+                    torchvision.utils.save_img(img_grid_fake, 'fakeimgs{b}.png')
 
             pbar.set_description(f'discriminator loss at epoch {e} = {loss_d.item():.4f}; generator loss at epoch {e} = {loss_g.item():.4f};')
 
