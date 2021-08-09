@@ -57,6 +57,10 @@ def plt_imgs(imgs, batch_size, save_path):
     for r in range(rows):
         for c in range(cols):
             img = imgs[(r * cols + c % cols)]
+            img = np.transpose(img, (1,2,0))
+            if img.shape[2] == 1:
+                img = img[:,:,0]
+
             axs[r, c].imshow(img)
 
     plt.savefig(save_path, dpi=fig.dpi)
