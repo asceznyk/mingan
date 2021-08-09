@@ -50,23 +50,6 @@ class ImageDir(Dataset):
         img = Image.open(self.files[i])
         return self.transform(img), 1
 
-def plt_imgs(imgs, batch_size, save_path):
-    rows, cols = 4, batch_size // 4
-    fig, axs = plt.subplots(rows, cols)
-
-    for r in range(rows):
-        for c in range(cols):
-            img = imgs[(r * cols + c % cols)]
-            img = np.transpose(img, (1,2,0))
-            if img.shape[2] == 1:
-                img = img[:,:,0]
-            else:
-                img = img.clip(min=0)
-
-            axs[r, c].imshow(img)
-
-    plt.savefig(save_path, dpi=fig.dpi)
-
 def init_dataset(mode, tsfm):
     root = 'dataset/'
     if mode == 'dcgan':
@@ -154,15 +137,11 @@ def train_gan(options):
 
             if b % 100 == 0:
                 real_imgs = real_imgs.view(-1, nc, img_size, img_size)
-                #real_imgs = real_imgs.detach().cpu().numpy()
-                #plt_imgs(real_imgs, 32, f'realimgs{b}.png')
                 img_grid_real = torchvision.utils.make_grid(real_imgs[:32], normalize=True)
                 torchvision.utils.save_image(img_grid_real, f'realimgs{b}.png')
 
                 with torch.no_grad():
                     fake_imgs = gen(noise()).view(-1, nc, img_size, img_size)
-                    #fake_imgs = fake_imgs.detach().cpu().numpy()
-                    #plt_imgs(fake_imgs, 32, f'fakeimgs{b}.png')
                     img_grid_fake = torchvision.utils.make_grid(fake_imgs[:32], normalize=True)
                     torchvision.utils.save_image(img_grid_fake, f'fakeimgs{b}.png')
 
