@@ -25,9 +25,9 @@ from models import *
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-def get_random_noise(dim, batch_size=1, single=True):
-    n = torch.randn((batch_size, dim))
-    n = n if single else n.view(batch_size, dim, 1, 1)
+def get_random_noise(z_dim, batch_size=1, single=True):
+    n = torch.randn((batch_size, z_dim))
+    n = n if single else n.view(batch_size, z_dim, 1, 1)
     return n.to(device)
 
 def get_transform(size):
@@ -36,19 +36,6 @@ def get_transform(size):
         transforms.Resize((size, size)),
         transforms.Normalize((0.5,), (0.5,))
     ])
-
-class ImageDir(Dataset):
-    def __init__(self, dirctry, transform):
-        self.dirctry = dirctry
-        self.files = [dirctry+'/'+f for f in os.listdir(dirctry)]
-        self.transform = transform
-
-    def __len__(self):
-        return len(self.files)
-
-    def __getitem__(self, i):
-        img = Image.open(self.files[i])
-        return self.transform(img), 1
 
 def init_dataset(mode, tsfm):
     root = 'dataset/'
@@ -63,8 +50,6 @@ def init_gan(mode, img_size, z_dim, batch_size, nc):
         lr = 2e-4
         img_dim = (nc, img_size, img_size)
         gan = DCGAN(img_dim, z_dim)
-        init_weights(gan.disc)
-        init_weights(gan.gen)
         single = False
     else:
         if mode != 'fcgan':
@@ -94,7 +79,7 @@ def train_gan(options):
     if options.dataset is None:
         dataset = init_dataset(mode, tsfm)
     else:
-        dataset = ImageDir(options.dataset, tsfm)
+        dataset = datasets.ImageFolder(root=options.dataset, transform=tsfm)
 
     nc = dataset[0][0].size(0)
     disc, gen, noise, lr, img_dim = init_gan(mode, img_size, z_dim, batch_size, nc)
@@ -102,6 +87,8 @@ def train_gan(options):
     betas = (0.5, 0.999) if mode == 'dcgan' else (0.9, 0.999)
     optim_disc = optim.Adam(disc.parameters(), lr=lr, betas=betas)
     optim_gen = optim.Adam(gen.parameters(), lr=lr, betas=betas)
+
+    fixed_noise = noise()
 
     gen.train()
     disc.train()
@@ -123,8 +110,8 @@ def train_gan(options):
                 loss_d = (loss_dx + loss_dg) / 2
 
                 disc.zero_grad()
-                loss_d.backward()
-                #loss_d.backward(retain_graph=True)
+                #loss_d.backward()
+                loss_d.backward(retain_graph=True)
                 optim_disc.step()
 
             fake_imgs = gen(noise()).to(device)
@@ -141,7 +128,7 @@ def train_gan(options):
                 torchvision.utils.save_image(img_grid_real, f'realimgs{b}.png')
 
                 with torch.no_grad():
-                    fake_imgs = gen(noise()).view(-1, nc, img_size, img_size)
+                    fake_imgs = gen(fixed_noise).view(-1, nc, img_size, img_size)
                     img_grid_fake = torchvision.utils.make_grid(fake_imgs[:32], normalize=True)
                     torchvision.utils.save_image(img_grid_fake, f'fakeimgs{b}.png')
 

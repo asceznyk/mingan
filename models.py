@@ -96,5 +96,5 @@ class  DCGAN:
     def __init__(self, img_dim, z_dim, f_disc=64, f_gen=64):
         self.disc = DCDisc(img_dim, f_disc)
         self.gen = DCGen(img_dim, z_dim, f_gen)
-
-
+        init_weights(gan.disc)
+        init_weights(gan.gen)
