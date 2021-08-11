@@ -122,7 +122,7 @@ def train_gan(options):
             loss_g.backward()
             optim_gen.step()
 
-            if b % 100 == 0:
+            if b % options.save_steps == 0:
                 real_imgs = real_imgs.view(-1, nc, img_size, img_size)
                 img_grid_real = torchvision.utils.make_grid(real_imgs[:32], normalize=True)
                 torchvision.utils.save_image(img_grid_real, f'realimgs{b}.png')
@@ -143,6 +143,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, help='batch size', default=32)
     parser.add_argument('--z_dim', type=int, help='dimensionality of noise', default=64)
     parser.add_argument('--k_steps', type=int, help='number of steps to train discriminator', default=1)
+    parser.add_argument('--save_steps', type=int, help='save fake images for each n steps')
     parser.add_argument('--epochs', type=int, help='number of epochs to train model', default=30)
 
     options = parser.parse_args()
