@@ -143,7 +143,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, help='batch size', default=32)
     parser.add_argument('--z_dim', type=int, help='dimensionality of noise', default=64)
     parser.add_argument('--k_steps', type=int, help='number of steps to train discriminator', default=1)
-    parser.add_argument('--save_steps', type=int, help='save fake images for each n steps')
+    parser.add_argument('--save_steps', type=int, help='save fake images for each n steps', default=100)
     parser.add_argument('--epochs', type=int, help='number of epochs to train model', default=30)
 
     options = parser.parse_args()
