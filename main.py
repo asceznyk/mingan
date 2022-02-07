@@ -93,6 +93,7 @@ def train_gan(options):
     gen.train()
     disc.train()
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    pg = None
     for e in range(1, epochs+1):
         pbar = tqdm(enumerate(loader), total=len(loader))
         for b, (real_imgs, _) in pbar:
@@ -113,8 +114,8 @@ def train_gan(options):
                 loss_d.backward(retain_graph=True)
                 optim_disc.step()
 
-            fake_imgs = gen(noise()).to(device)
-            pg = disc(fake_imgs)
+            #fake_imgs = gen(noise()).to(device)
+            #pg = disc(fake_imgs)
             loss_g = criterion(pg, torch.ones_like(pg)) #log(d(g(z))) maximizing
             
             gen.zero_grad()
