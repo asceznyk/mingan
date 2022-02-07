@@ -110,7 +110,7 @@ def train_gan(options):
                 loss_d = (loss_dx + loss_dg) / 2
 
                 disc.zero_grad()
-                loss_d.backward()#retain_graph=True)
+                loss_d.backward(retain_graph=True)
                 optim_disc.step()
 
             #fake_imgs = gen(noise()).to(device)
