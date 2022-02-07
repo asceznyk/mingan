@@ -114,7 +114,7 @@ def train_gan(options):
                 optim_disc.step()
 
             #fake_imgs = gen(noise()).to(device)
-            pg = disc(fake_imgs)
+            #pg = disc(fake_imgs)
             loss_g = criterion(pg, torch.ones_like(pg)) #log(d(g(z))) maximizing
             
             gen.zero_grad()
